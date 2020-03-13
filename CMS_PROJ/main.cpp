@@ -4,8 +4,10 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);//Base Qt class, which is responsible for handling main loop of events
+
     CMainWindow w;
     w.show();
-    return a.exec();
+
+    return app.exec();//Starts main loop of events
 }

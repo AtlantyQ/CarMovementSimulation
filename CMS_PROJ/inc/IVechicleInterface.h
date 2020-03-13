@@ -3,29 +3,36 @@
 
 #include <QObject>
 
-typedef enum
+enum class VechicleType : int
 {
-    VT_FORD = 0x00,
-    VT_MUSTANG = 0x01,
-    VT_FERRARI = 0x02,
-    VT_FIAT = 0x03,
-} VechicleType;
+    FORD = 0x00,
+    MUSTANG,
+    FERRARI,
+    BMW,
+    AUDI,
+    MERCEDES,
+    ALFA,
+    FIAT,
+    MAX
+};
 
-typedef enum
+typedef struct
 {
-    LINEAR = 0x00,
-    LOGARYTHMIC = 0x01,
-} Veliocity;
-
+    int x;
+    int y;
+} Position;
 
 class IVechicleCtrl : public QObject
 {
     Q_OBJECT
 public:
     IVechicleCtrl( QObject* parent = 0 ) : QObject( parent ){}
-    ~IVechicleCtrl();
+    ~IVechicleCtrl(){}
 
     virtual void move( int dt) = 0;
+    virtual void setPos( const Position& positon ) = 0;
+    virtual Position getPos() const = 0;
+    virtual IVechicleCtrl* getClone() = 0;
 };
 
 
