@@ -8,21 +8,24 @@
 #include <vector>
 #include <map>
 #include "IVechicleManager.h"
+#include "IVechicleInterface.h"
 
 typedef std::vector<std::unique_ptr<IVechicleModel>> VechicleQueue;
+typedef std::map< VechicleType, std::unique_ptr<IVechicleModel> > VechicleMap;
 
 class CVechicleManager : public IVechicleManager
 {
 public:
-    CVechicleManager( QObject* parent = nullptr );
+    CVechicleManager();
     virtual ~CVechicleManager();
     void AddNextVechicleToQueue();
+    void CreatePrototypes( QWidget* parent = nullptr ) ;
 
 private:
     IVechicleModel* GetCarPrototype( VechicleType id );
     void worker_thread();
 
-    std::map< VechicleType, std::unique_ptr<IVechicleModel> > m_CarPrototypes;
+    VechicleMap m_CarPrototypes;
     std::mutex m_CarQueueMtx;
     std::mutex m_CarPrototypeMtx;
     VechicleQueue m_VechiclesQueue;
@@ -30,7 +33,7 @@ private:
     std::thread m_Thread;
     bool isRunning;
 
-    static constexpr int FINAL_POINT = 800;
+    static constexpr int FINAL_POINT = 500;
 };
 
 #endif // CVECHICLEMANAGER_H

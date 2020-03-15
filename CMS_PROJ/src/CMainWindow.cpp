@@ -14,20 +14,21 @@ CMainWindow::CMainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->setStyleSheet("background-color: #FFFFFF;");
 
     m_Timer.setTimerType( Qt::PreciseTimer );
-    m_Timer.singleShot( timeout, this, SLOT(AddNextVechicleToQueue()) );
+    m_Timer.singleShot( timeout, this, SLOT(TimeOut()) );
 }
 
-CMainWindow::~CMainWindow()
+void CMainWindow::show()
 {
+    QMainWindow::show();
+    m_VechicleCtrl->CreatePrototypes( this );
 }
 
-
-void CMainWindow::sltTimeOut()
+void CMainWindow::TimeOut()
 {
     int nextTimeout = RAND_TIMEOUT( minTimeout, maxTimeout );
 
     m_VechicleCtrl->AddNextVechicleToQueue();
-    m_Timer.singleShot( nextTimeout, this, SLOT(sltTimeOut()) );
+    m_Timer.singleShot( 5, this, SLOT(TimeOut()) );
 }
 
 

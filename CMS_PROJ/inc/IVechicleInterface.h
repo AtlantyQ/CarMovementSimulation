@@ -18,8 +18,8 @@ enum class VechicleType : int
 
 typedef struct
 {
-    int x;
-    int y;
+    double x;
+    double y;
 } Position;
 
 class IVechicleModel : public QObject
@@ -27,9 +27,11 @@ class IVechicleModel : public QObject
     Q_OBJECT
 public:
     IVechicleModel( QObject* parent = nullptr ) : QObject( parent ){}
-    ~IVechicleModel() = default;
+    virtual ~IVechicleModel() = default;
 
     virtual void move() = 0;
+    virtual void stop() = 0;
+    virtual void hide() = 0;
     virtual void setPos( const Position& positon ) = 0;
     virtual Position getPos() const = 0;
     virtual IVechicleModel* getClone() = 0;

@@ -11,10 +11,11 @@ class CMainWindow : public QMainWindow
 
 public:
     CMainWindow(QWidget *parent = nullptr);
-    ~CMainWindow();
+    ~CMainWindow() = default;
+    void show();
 
 private:
-    Q_SLOT void sltTimeOut();
+    Q_SLOT void TimeOut();
 
     QWidget m_Road;
     QTimer m_Timer;
