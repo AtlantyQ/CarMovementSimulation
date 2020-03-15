@@ -22,17 +22,17 @@ typedef struct
     int y;
 } Position;
 
-class IVechicleCtrl : public QObject
+class IVechicleModel : public QObject
 {
     Q_OBJECT
 public:
-    IVechicleCtrl( QObject* parent = 0 ) : QObject( parent ){}
-    ~IVechicleCtrl(){}
+    IVechicleModel( QObject* parent = nullptr ) : QObject( parent ){}
+    ~IVechicleModel() = default;
 
-    virtual void move( int dt) = 0;
+    virtual void move() = 0;
     virtual void setPos( const Position& positon ) = 0;
     virtual Position getPos() const = 0;
-    virtual IVechicleCtrl* getClone() = 0;
+    virtual IVechicleModel* getClone() = 0;
 };
 
 

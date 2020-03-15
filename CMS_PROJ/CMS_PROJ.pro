@@ -1,8 +1,7 @@
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
 CONFIG+= c++1z
 
 # The following define makes your compiler emit warnings if you use
@@ -19,14 +18,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     src/CVechicleManager.cpp \
     src/CMainWindow.cpp \
-    src/CVechicleControler.cpp \
-    main.cpp \
+    src/CVechicleModel.cpp \
+    main.cpp
 
 HEADERS += \ \
     inc/CVechicleManager.h \
     inc/CMainWindow.h \
-    inc/CVechicleControler.h \
-    inc/IVechicleInterface.h
+    inc/CVechicleModel.h \
+    inc/IVechicleInterface.h \
+    inc/IVechicleManager.h
 
 
 FORMS +=
