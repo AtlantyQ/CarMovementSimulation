@@ -5,31 +5,26 @@
 #include <QTimer>
 #include <QMetaObject>
 
-#define logDebug( arg ) printf( arg )
-
-CVehicleManager::CVehicleManager() : m_Thread( &CVehicleManager::worker_thread, this ),
-                                                        isRunning(true)
+CVehicleManager::CVehicleManager()
 {
 }
 
 void CVehicleManager::CreatePrototypes( QWidget* parent )
 {
-    m_CarPrototypes[VehicleType::FORD]     = std::make_unique<CVehicleModel>( new CVehicleModel( "FORD", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::MUSTANG]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "MUSTANG", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::FERRARI]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "FERRARI", "#F4F4F4", { 0.02, 0.05, 0.0001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::BMW]      = std::make_unique<CVehicleModel>(  new CVehicleModel( "BMW", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent ) );
-    m_CarPrototypes[VehicleType::AUDI]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "AUDI", "#F4F4F4", { 00.2, 0.05, 0.001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::MERCEDES] = std::make_unique<CVehicleModel>(  new CVehicleModel( "MERCEDES", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::ALFA]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "ALFA", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent) );
-    m_CarPrototypes[VehicleType::FIAT]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "FIAT", "#F4F4F4", { 0.02, 0.05, 0.001 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FORD]     = std::make_unique<CVehicleModel>( new CVehicleModel( "FORD", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::MUSTANG]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "MUSTANG", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FERRARI]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "FERRARI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::BMW]      = std::make_unique<CVehicleModel>(  new CVehicleModel( "BMW", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent ) );
+    m_CarPrototypes[VehicleType::AUDI]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "AUDI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::MERCEDES] = std::make_unique<CVehicleModel>(  new CVehicleModel( "MERCEDES", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::ALFA]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "ALFA", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FIAT]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "FIAT", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
 
-    m_Thread.detach();
+    QTimer::singleShot( 1000 , this, SLOT(AsyncWorkerCaller()) );
 }
 
 CVehicleManager::~CVehicleManager()
 {
-    isRunning = false;
-    m_Thread.join();
 }
 
 void CVehicleManager::AddNextVehicleToQueue()
@@ -40,64 +35,51 @@ void CVehicleManager::AddNextVehicleToQueue()
         VehicleType id = static_cast<VehicleType>( std::rand() % range );
         return id;
     };
-
-
     VehicleType id = getRandomVehicleId();
 
     std::lock_guard<std::mutex> mlck( m_CarQueueMtx );
-    m_VehiclesQueue.push_back( std::make_unique<CVehicleModel>(static_cast<CVehicleModel*>(m_CarPrototypes[id]->getClone())));
-
-    //cv.notify_one();
+    m_VehiclesQueue.push_back( std::make_unique<CVehicleModel>( static_cast<CVehicleModel*>(m_CarPrototypes[id]->getClone()) ) );
 }
 
-void CVehicleManager::worker_thread()
+void CVehicleManager::AsyncWorkerCaller()
 {
-    while(isRunning)
+    auto f = std::async( std::launch::async, &CVehicleManager::worker, this );
+    f.get();
+    QTimer::singleShot( 10, this, SLOT( AsyncWorkerCaller() ) );
+}
+
+void CVehicleManager::worker()
+{
+    std::lock_guard<std::mutex> mlck( m_CarQueueMtx );
+    //qDebug() << QString("m_VehiclesQueue: %1 \n").arg(m_VehiclesQueue.size());
+    for( auto vehicle = m_VehiclesQueue.begin(); vehicle != m_VehiclesQueue.end(); ++vehicle )
     {
-        if(m_VehiclesQueue.empty())
+        if( IsAboutToCrash( vehicle, (vehicle - 1) ) )
         {
-            std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
-            continue;
+            //QMetaObject::invokeMethod( vehicle->get(), "stop", Qt::DirectConnection );//GUI have to be updated from main thread
+        }
+        else
+        {
+            QMetaObject::invokeMethod( vehicle->get(), "move", Qt::DirectConnection );
         }
 
-        //std::unique_lock<std::mutex> mlck( m_CarQueueMtx );
-        //cv.wait( mlck, [&]{ return !m_VehiclesQueue.empty(); } );
-
-        m_CarQueueMtx.lock();
-        for( auto vehicle = m_VehiclesQueue.begin(); vehicle != m_VehiclesQueue.end(); ++vehicle )
+        if( (*vehicle)->getPos().x >= FINAL_POINT )
         {
-            if( IsAboutToCrash( vehicle ) )
-            {
-               // QMetaObject::invokeMethod( vehicle->get(), "stop", Qt::QueuedConnection );//GUI have to be updated from main thread
-            }
-            else
-            {
-                QMetaObject::invokeMethod( vehicle->get(), "move", Qt::QueuedConnection );
-            }
-
-            if( (*vehicle)->getPos().x >= FINAL_POINT )
-            {
-                m_VehiclesQueue.erase( vehicle );
-                vehicle--;
-            }
+            m_VehiclesQueue.erase( vehicle );
+            vehicle--;
         }
-        m_CarQueueMtx.unlock();
-        //mlck.unlock();
     }
 }
 
-bool CVehicleManager::IsAboutToCrash(VehicleQueue::iterator vehicle)
+bool CVehicleManager::IsAboutToCrash(VehicleQueue::iterator currentVehicle, VehicleQueue::iterator nextVehicle)
 {
-    if(  m_VehiclesQueue.size() > 0 && vehicle == m_VehiclesQueue.begin() )
+    if( currentVehicle == m_VehiclesQueue.begin() )
         return false;
-
-    VehicleQueue::iterator currentVehicle = vehicle;
-    VehicleQueue::iterator nextVehicle = std::prev( vehicle );
 
     double currVehPosition = (*currentVehicle)->getPos().x;
     double nextVehPosition = (*nextVehicle)->getPos().x;
 
-    if( ( nextVehPosition - currVehPosition ) > MAX_DISTANCE )
+    if( ( nextVehPosition - currVehPosition ) < MAX_DISTANCE )
     {
         return true;
     }

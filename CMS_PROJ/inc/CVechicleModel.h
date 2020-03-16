@@ -10,6 +10,8 @@
 #include <memory>
 #include "IVechicleInterface.h"
 
+class CWidgetFactory;
+
 
 class Timer : public QElapsedTimer
 {
@@ -55,23 +57,23 @@ public:
     void setSpeedValue( double speed );
     Position getPos() const;
     IVehicleModel* getClone();
+
 public slots:
     void move();
     void stop();
     void hide();
+
 private:
     double calculateSpeed( const double dt );
 
-//Private members
-
     QWidget* m_Car;
-    QWidget* m_parent;
-    QLabel* m_Speed;
+    QLabel* m_SpeedVal;
+    CWidgetFactory* m_Factory;
     Position m_CarPosition;
     std::string m_CarType;
     Timer m_Timer;
     Factor m_Factor;
-    int m_MaxSpeed;
+    double m_MaxSpeed;
 
 };
 

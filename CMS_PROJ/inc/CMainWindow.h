@@ -21,8 +21,8 @@ private:
     QTimer m_Timer;
     IVehicleManager* m_VehicleCtrl;
 
-    static constexpr int maxTimeout = 7000;
-    static constexpr int minTimeout = 4000;
+    static constexpr int maxTimeout = 7500;
+    static constexpr int minTimeout = 2000;
 
 };
 #endif // CMAINWINDOW_H

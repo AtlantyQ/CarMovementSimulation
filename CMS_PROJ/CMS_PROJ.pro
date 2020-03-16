@@ -19,12 +19,14 @@ SOURCES += \
     src/CVechicleManager.cpp \
     src/CMainWindow.cpp \
     src/CVechicleModel.cpp \
-    main.cpp
+    main.cpp \
+    src/CWidgetFactory.cpp
 
 HEADERS += \ \
     inc/CVechicleManager.h \
     inc/CMainWindow.h \
     inc/CVechicleModel.h \
+    inc/CWidgetFactory.h \
     inc/IVechicleInterface.h \
     inc/IVechicleManager.h
 
