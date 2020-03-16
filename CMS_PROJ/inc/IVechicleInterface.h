@@ -1,9 +1,9 @@
-#ifndef IVECHICLEINTERFACE_H
-#define IVECHICLEINTERFACE_H
+#ifndef IVehicleINTERFACE_H
+#define IVehicleINTERFACE_H
 
 #include <QObject>
 
-enum class VechicleType : int
+enum class VehicleType : int
 {
     FORD = 0x00,
     MUSTANG,
@@ -22,20 +22,21 @@ typedef struct
     double y;
 } Position;
 
-class IVechicleModel : public QObject
+class IVehicleModel : public QObject
 {
     Q_OBJECT
 public:
-    IVechicleModel( QObject* parent = nullptr ) : QObject( parent ){}
-    virtual ~IVechicleModel() = default;
+    IVehicleModel( QObject* parent = nullptr ) : QObject( parent ){}
+    virtual ~IVehicleModel() = default;
 
+    virtual void setPos( const Position& positon ) = 0;
+    virtual Position getPos() const = 0;
+    virtual IVehicleModel* getClone() = 0;
+public slots:
     virtual void move() = 0;
     virtual void stop() = 0;
     virtual void hide() = 0;
-    virtual void setPos( const Position& positon ) = 0;
-    virtual Position getPos() const = 0;
-    virtual IVechicleModel* getClone() = 0;
 };
 
 
-#endif // IVECHICLEINTERFACE_H
+#endif // IVehicleINTERFACE_H

@@ -19,10 +19,10 @@ private:
 
     QWidget m_Road;
     QTimer m_Timer;
-    IVechicleManager* m_VechicleCtrl;
+    IVehicleManager* m_VehicleCtrl;
 
-    static constexpr int maxTimeout = 5000;
-    static constexpr int minTimeout = 1000;
+    static constexpr int maxTimeout = 7000;
+    static constexpr int minTimeout = 4000;
 
 };
 #endif // CMAINWINDOW_H

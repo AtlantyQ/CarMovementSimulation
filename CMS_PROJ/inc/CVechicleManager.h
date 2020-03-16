@@ -1,5 +1,5 @@
-#ifndef CVECHICLEMANAGER_H
-#define CVECHICLEMANAGER_H
+#ifndef CVehicleMANAGER_H
+#define CVehicleMANAGER_H
 
 #include <QObject>
 #include <condition_variable>
@@ -10,31 +10,33 @@
 #include "IVechicleManager.h"
 #include "IVechicleInterface.h"
 
-typedef std::vector<std::unique_ptr<IVechicleModel>> VechicleQueue;
-typedef std::map< VechicleType, std::unique_ptr<IVechicleModel> > VechicleMap;
+typedef std::vector<std::unique_ptr<IVehicleModel>> VehicleQueue;
+typedef std::map< VehicleType, std::unique_ptr<IVehicleModel> > VehicleMap;
 
-class CVechicleManager : public IVechicleManager
+class CVehicleManager : public IVehicleManager
 {
 public:
-    CVechicleManager();
-    virtual ~CVechicleManager();
-    void AddNextVechicleToQueue();
+    CVehicleManager();
+    virtual ~CVehicleManager();
+    void AddNextVehicleToQueue();
     void CreatePrototypes( QWidget* parent = nullptr ) ;
 
 private:
-    IVechicleModel* GetCarPrototype( VechicleType id );
+    IVehicleModel* GetCarPrototype( VehicleType id );
+    bool IsAboutToCrash(VehicleQueue::iterator Vehicle);
     void worker_thread();
 
-    VechicleMap m_CarPrototypes;
+    VehicleMap m_CarPrototypes;
     std::mutex m_CarQueueMtx;
     std::mutex m_CarPrototypeMtx;
-    VechicleQueue m_VechiclesQueue;
+    VehicleQueue m_VehiclesQueue;
     std::condition_variable cv;
     std::thread m_Thread;
     bool isRunning;
 
-    static constexpr int FINAL_POINT = 500;
+    static constexpr int FINAL_POINT = 750;
+    static constexpr int MAX_DISTANCE = 80;
 };
 
-#endif // CVECHICLEMANAGER_H
+#endif // CVehicleMANAGER_H
 

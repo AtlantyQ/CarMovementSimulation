@@ -3,12 +3,12 @@
 
 #include <QWidget>
 
-class IVechicleManager
+class IVehicleManager
 {
 public:
-    IVechicleManager() = default;
-    virtual ~IVechicleManager() = default;
-    virtual void AddNextVechicleToQueue() = 0;
+    IVehicleManager() = default;
+    virtual ~IVehicleManager() = default;
+    virtual void AddNextVehicleToQueue() = 0;
     virtual void CreatePrototypes( QWidget* parent = nullptr) = 0;
 };
 

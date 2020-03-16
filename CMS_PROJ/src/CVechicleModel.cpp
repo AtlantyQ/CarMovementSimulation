@@ -1,120 +1,170 @@
 #include "CVechicleModel.h"
-
+#include <cmath>
+#include <QDebug>
+#include <QMetaObject>
 #define logDebug( arg,... ) printf( arg )
+#define PI 3.14159265
 
-CVechicleModel::CVechicleModel( std::string type, Qt::GlobalColor color, double factor, int maxSpeed, QWidget* parent ) : m_Car( new QWidget( parent ) )
+CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor factor, int maxSpeed, QWidget* parent ) : m_Car( new QWidget( parent ) )
                                                                                                                         , m_parent(parent)
                                                                                                                         , m_Speed( new QLabel( "0 km/h", parent ))
-                                                                                                                        , m_CarPosition{400, 0}
+                                                                                                                        , m_CarPosition{ 0, 480}
                                                                                                                         , m_CarType( type )
-                                                                                                                        , m_Factor{ factor, 0}
+                                                                                                                        , m_Factor(factor)
                                                                                                                         , m_MaxSpeed( maxSpeed )
 
 {
     m_Car->setStyleSheet("background-color: #F4F4F4; border-style: solid; border-color: black");
-    m_Car->setFixedSize( 80, 140 );
+    m_Car->setFixedSize( 80, 40 );
     m_Car->move( m_CarPosition.x, m_CarPosition.y );
-    //m_Car->show();
-
 }
 
-CVechicleModel::~CVechicleModel()
+CVehicleModel::~CVehicleModel()
 {
-    m_Car->deleteLater();
+    //qDebug() << "~CVehicleModel()\n";
+    if( m_Car )
+    {
+        //qDebug() << "~m_Car()\n";
+        m_Car->hide();
+        m_Car->deleteLater();
+        m_Car = nullptr;
+    }
 
+    if( m_Speed )
+    {
+        //qDebug() << "~m_Speed()\n";
+        m_Speed->hide();
+        m_Speed->deleteLater();
+        m_Speed = nullptr;
+    }
+    //qDebug() << "~CVehicleModel() return\n";
 }
 
-CVechicleModel::CVechicleModel( CVechicleModel& x )
+CVehicleModel::CVehicleModel( CVehicleModel& x )
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
-    //assert( !parent );
-
+    ///@TODO: Make Factory Method
     this->m_Car = new QWidget( parent );
-    this->m_Car->setStyleSheet("background-color: #F4F4F4; border-style: solid; border-color: black");
-    this->m_Car->setFixedSize( 80, 140 );
+    this->m_Car->setStyleSheet( x.m_Car->styleSheet() );
+    this->m_Car->setFixedSize( x.m_Car->size() );
     this->m_Car->show();
 
-    this->m_Speed = new QLabel( "0 km/h", parent );
+    this->m_Speed = new QLabel( "0 km/h", this->m_Car );
+    this->m_Speed->setFixedSize( 80, 40 );
+    this->m_Speed->move( 25, 0 );
     this->m_Speed->show();
 
-    this->m_CarPosition = {480, 0};
+    this->m_CarPosition = {0, 480};
     this->m_Factor = x.m_Factor;
     this->m_MaxSpeed = x.m_MaxSpeed;
 }
 
-CVechicleModel::CVechicleModel( CVechicleModel* x )
+CVehicleModel::CVehicleModel( CVehicleModel* x )
 {
     QWidget* parent = dynamic_cast<QWidget*>( x->m_Car->parent() );
     //assert( !parent );
 
     this->m_Car = new QWidget( parent );
-    this->m_Car->setStyleSheet("background-color: #F4F4F4; border-style: solid; border-color: black");
-    this->m_Car->setFixedSize( 80, 140 );
+    this->m_Car->setStyleSheet( x->m_Car->styleSheet() );
+    this->m_Car->setFixedSize( x->m_Car->size() );
     this->m_Car->show();
 
-    this->m_Speed = new QLabel( "0 km/h", parent );
+    this->m_Speed = new QLabel( "0 km/h", this->m_Car );
+    this->m_Speed->setFixedSize( 80, 40 );
+    this->m_Speed->move( 25, 0);
     this->m_Speed->show();
 
-    this->m_CarPosition = {480, 0};
+    this->m_CarPosition = {0, 480};
     this->m_Factor = x->m_Factor;
     this->m_MaxSpeed = x->m_MaxSpeed;
 }
 
-CVechicleModel& CVechicleModel::operator=( CVechicleModel& x )
+CVehicleModel& CVehicleModel::operator=( CVehicleModel& x )
 {
     QWidget* parent = dynamic_cast<QWidget*>( x.m_Car->parent() );
     assert( !parent );
 
-    m_Car = new QWidget( parent );
+    this->m_Car = new QWidget( parent );
     this->m_Car->show();
-    m_Speed = new QLabel( "0 km/h", parent );
+
+    this->m_Speed = new QLabel( "0 km/h", this->m_Car );
+    this->m_Speed->move( 25, 0 );
+    this->m_Speed->setFixedSize( 80, 40 );
     this->m_Speed->show();
-    m_CarPosition = {480, 0};
+
+    m_CarPosition = {0, 480};
     m_Factor = x.m_Factor;
     m_MaxSpeed = x.m_MaxSpeed;
 
     return x;
 }
 
-void CVechicleModel::move()
+void CVehicleModel::move()
 {
     m_Timer.start();
+    double dt = m_Timer.elapsed()/100000.0;
+    double speed = this->calculateSpeed( dt );
+    double dx = 1 * speed;
+    double dy = 0 * speed;
 
-    double dt = m_Timer.elapsed()/100;
-    printf( "dt: %d dt/1000: %f \n", m_Timer.elapsed(), dt );
-    m_CarPosition.x = 480;
-    m_CarPosition.y = this->calculateMovement( dt );
-    printf( "m_CarPosition x: %f y: %f\n", m_CarPosition.x, m_CarPosition.y );
-    setPos( m_CarPosition );
+    m_CarPosition.x += dx;
+    m_CarPosition.y += dy;
+
+    this->setPos( m_CarPosition );
+    this->setSpeedValue( speed );
 }
 
-void CVechicleModel::stop()
+void CVehicleModel::stop()
 {
+    double dt = m_Timer.elapsed()/100000.0;
+    double x0 = 2 * m_Factor.a + m_Factor.b;
+    double f1 = m_Factor.a  + m_Factor.b + m_Factor.c;
+    double speed = -1/x0 * dt + f1 * x0;
 
+    double dx = 1 * speed;
+    double dy = 0 * speed;
+
+    m_CarPosition.x += dx;
+    m_CarPosition.y += dy;
+
+    this->setPos( m_CarPosition );
+
+    //http://zdajmyrazem.pl/Main/Theory/rownanie-stycznej-do-wykresu-funkcji-NTE5NA%3D%3D
+    //https://matfiz24.pl/funkcja-liniowa/prosta-prostopadla-rownolegla-zadania
 }
 
-void CVechicleModel::hide()
+void CVehicleModel::hide()
 {
     m_Car->hide();
 }
 
-double CVechicleModel::calculateMovement( double dt )
+double CVehicleModel::calculateSpeed( double dt )
 {
-    return m_Factor.a * dt + m_Factor.b;
+    double speed = m_Factor.a * dt * dt + m_Factor.b * dt + m_Factor.c;
+
+    if( speed > m_MaxSpeed )
+        speed = m_MaxSpeed;
+
+    return speed;
 }
 
-void CVechicleModel::setPos( const Position& positon  )
+void CVehicleModel::setPos( const Position& positon  )
 {
-    m_Car->show();
     m_Car->move( positon.x, positon.y );
 }
 
-IVechicleModel* CVechicleModel::getClone()
+void CVehicleModel::setSpeedValue( double speed )
 {
-    return new CVechicleModel( *this );
+    //std::string speedTxt = std::to_string( speed * 100000 ).substr(0, 5) + std::string(" km/h");
+    //m_Speed->setText( speedTxt.c_str() );
 }
 
-Position CVechicleModel::getPos() const
+IVehicleModel* CVehicleModel::getClone()
+{
+    return new CVehicleModel( *this );
+}
+
+Position CVehicleModel::getPos() const
 {
     return m_CarPosition;
 }

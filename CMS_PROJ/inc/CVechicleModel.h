@@ -1,5 +1,5 @@
-#ifndef CVECHICLECONTROLER_H
-#define CVECHICLECONTROLER_H
+#ifndef CVehicleCONTROLER_H
+#define CVehicleCONTROLER_H
 
 #include <QWidget>
 #include <QLabel>
@@ -36,28 +36,31 @@ typedef struct
 {
     double a;
     double b;
+    double c;
 } Factor;
 
-class CVechicleModel : public IVechicleModel
+class CVehicleModel : public IVehicleModel
 {
     Q_OBJECT
 
 public:
-    CVechicleModel( std::string type, Qt::GlobalColor color, double factor, int maxSpeed, QWidget* parent = nullptr );
-    CVechicleModel( CVechicleModel& x );
-    CVechicleModel( CVechicleModel* x );
-    CVechicleModel& operator=( CVechicleModel& x );
-    virtual ~CVechicleModel();
+    CVehicleModel( std::string type, std::string color, Factor factor, int maxSpeed, QWidget* parent = nullptr );
+    CVehicleModel( CVehicleModel& x );
+    CVehicleModel( CVehicleModel* x );
+    CVehicleModel& operator=( CVehicleModel& x );
+    virtual ~CVehicleModel();
 
+
+    void setPos( const Position& positon );
+    void setSpeedValue( double speed );
+    Position getPos() const;
+    IVehicleModel* getClone();
+public slots:
     void move();
     void stop();
     void hide();
-    void setPos( const Position& positon );
-    Position getPos() const;
-    IVechicleModel* getClone();
-
 private:
-    double calculateMovement( const double dt );
+    double calculateSpeed( const double dt );
 
 //Private members
 
@@ -72,4 +75,4 @@ private:
 
 };
 
-#endif // CVECHICLECONTROLER_H
+#endif // CVehicleCONTROLER_H
