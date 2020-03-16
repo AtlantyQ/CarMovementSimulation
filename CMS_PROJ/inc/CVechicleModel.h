@@ -48,7 +48,7 @@ class CVehicleModel : public IVehicleModel
 public:
     CVehicleModel( std::string type, std::string color, Factor factor, int maxSpeed, QWidget* parent = nullptr );
     CVehicleModel( CVehicleModel& x );
-    CVehicleModel( CVehicleModel* x );
+    CVehicleModel( CVehicleModel&& x );
     CVehicleModel& operator=( CVehicleModel& x );
     virtual ~CVehicleModel();
 

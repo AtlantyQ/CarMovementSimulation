@@ -11,14 +11,19 @@ CVehicleManager::CVehicleManager()
 
 void CVehicleManager::CreatePrototypes( QWidget* parent )
 {
-    m_CarPrototypes[VehicleType::FORD]     = std::make_unique<CVehicleModel>( new CVehicleModel( "FORD", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::MUSTANG]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "MUSTANG", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::FERRARI]  = std::make_unique<CVehicleModel>(  new CVehicleModel( "FERRARI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::BMW]      = std::make_unique<CVehicleModel>(  new CVehicleModel( "BMW", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent ) );
-    m_CarPrototypes[VehicleType::AUDI]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "AUDI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::MERCEDES] = std::make_unique<CVehicleModel>(  new CVehicleModel( "MERCEDES", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::ALFA]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "ALFA", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
-    m_CarPrototypes[VehicleType::FIAT]     = std::make_unique<CVehicleModel>(  new CVehicleModel( "FIAT", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FORD]     = std::make_unique<CVehicleModel>( CVehicleModel( "FORD", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::MUSTANG]  = std::make_unique<CVehicleModel>( CVehicleModel( "MUSTANG", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FERRARI]  = std::make_unique<CVehicleModel>( CVehicleModel( "FERRARI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::BMW]      = std::make_unique<CVehicleModel>( CVehicleModel( "BMW", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent ) );
+    m_CarPrototypes[VehicleType::AUDI]     = std::make_unique<CVehicleModel>( CVehicleModel( "AUDI", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::MERCEDES] = std::make_unique<CVehicleModel>( CVehicleModel( "MERCEDES", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::ALFA]     = std::make_unique<CVehicleModel>( CVehicleModel( "ALFA", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+    m_CarPrototypes[VehicleType::FIAT]     = std::make_unique<CVehicleModel>( CVehicleModel( "FIAT", "#F4F4F4", { 0.02, 0.5, 0.1 }, 100, parent) );
+
+    for(auto& vechicle : m_CarPrototypes )
+    {
+        vechicle.second.get()->hide();
+    }
 
     QTimer::singleShot( 1000 , this, SLOT(AsyncWorkerCaller()) );
 }
@@ -38,7 +43,7 @@ void CVehicleManager::AddNextVehicleToQueue()
     VehicleType id = getRandomVehicleId();
 
     std::lock_guard<std::mutex> mlck( m_CarQueueMtx );
-    m_VehiclesQueue.push_back( std::make_unique<CVehicleModel>( static_cast<CVehicleModel*>(m_CarPrototypes[id]->getClone()) ) );
+    m_VehiclesQueue.push_back( std::make_unique<CVehicleModel>( *(static_cast<CVehicleModel*>(m_CarPrototypes[id]->getClone())) ));
 }
 
 void CVehicleManager::AsyncWorkerCaller()

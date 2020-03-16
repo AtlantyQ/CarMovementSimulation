@@ -19,8 +19,11 @@ CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor facto
                                                                                                                    , m_MaxSpeed( maxSpeed )
 
 {
+    qDebug() << " CVehicleModel x";
     m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480} }, false );
+    m_Car->hide();
     m_SpeedVal = m_Factory->MakeLabelFrame( { m_Car, { 80, 40 }, { 20, 0 } }, false );
+    m_SpeedVal->hide();
 }
 
 CVehicleModel::~CVehicleModel()
@@ -38,7 +41,7 @@ CVehicleModel::~CVehicleModel()
     }
 }
 
-CVehicleModel::CVehicleModel( CVehicleModel& x )
+CVehicleModel::CVehicleModel( CVehicleModel&& x )
 {
     qDebug() << " CVehicleModel& x";
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
@@ -50,16 +53,16 @@ CVehicleModel::CVehicleModel( CVehicleModel& x )
     this->m_MaxSpeed = x.m_MaxSpeed;
 }
 
-CVehicleModel::CVehicleModel( CVehicleModel* x )
+CVehicleModel::CVehicleModel( CVehicleModel& x )
 {
-    qDebug() << " CVehicleModel* x";
-    QWidget* parent = static_cast<QWidget*>( x->m_Car->parent() );
+    qDebug() << " CVehicleModel& x";
+    QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480} } );
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480 } } );
     this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 20, 0 } } );
     this->m_CarPosition = { 0, 480 };
-    this->m_Factor = x->m_Factor;
-    this->m_MaxSpeed = x->m_MaxSpeed;
+    this->m_Factor = x.m_Factor;
+    this->m_MaxSpeed = x.m_MaxSpeed;
 }
 
 CVehicleModel& CVehicleModel::operator=( CVehicleModel& x )
@@ -136,7 +139,7 @@ void CVehicleModel::setSpeedValue( double speed )
 
 IVehicleModel* CVehicleModel::getClone()
 {
-    return new CVehicleModel( *this );
+    return this;
 }
 
 Position CVehicleModel::getPos() const
