@@ -2,6 +2,7 @@
 #include "CVechicleModel.h"
 #include <QTimer>
 #include <QMetaObject>
+#include <future>
 
 CVehicleManager::CVehicleManager()
 {
