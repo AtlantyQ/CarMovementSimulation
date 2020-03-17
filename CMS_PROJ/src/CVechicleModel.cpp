@@ -22,9 +22,6 @@ CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor facto
                                                                                                                    , m_CarType(type)
                                                                                                                    , m_Factor(factor)
                                                                                                                    , m_MaxSpeed( maxSpeed )
-                                                                                                                   , m_dtMv(0.0)
-                                                                                                                   , m_dtStop(0.0)
-
 {
     m_Car = m_Factory->MakeWidgetFrame( { parent, color, widgeSize, {widgetPos.x(), widgetPos.y()} }, false );
     m_SpeedVal = m_Factory->MakeLabelFrame( { m_Car, widgeSize, labelPos }, false );
@@ -59,9 +56,6 @@ CVehicleModel::CVehicleModel( CVehicleModel&& x ) : IVehicleModel( nullptr )
                                                   , m_CarType(x.m_CarType)
                                                   , m_Factor(x.m_Factor)
                                                   , m_MaxSpeed(x.m_MaxSpeed)
-                                                  , m_dtMv(0.0)
-                                                  , m_dtStop(0.0)
-
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
@@ -77,9 +71,6 @@ CVehicleModel::CVehicleModel( CVehicleModel& x ) : IVehicleModel( nullptr )
                                                  , m_CarType(x.m_CarType)
                                                  , m_Factor(x.m_Factor)
                                                  , m_MaxSpeed(x.m_MaxSpeed)
-                                                 , m_dtMv(0.0)
-                                                 , m_dtStop(0.0)
-
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
