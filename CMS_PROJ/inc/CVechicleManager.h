@@ -27,7 +27,7 @@ public:
 
 private:
     IVehicleModel* GetCarPrototype( VehicleType id );
-    bool IsAboutToCrash(VehicleQueue::iterator currentVehicle, VehicleQueue::iterator nextVehicle);
+    bool IsAboutToCrash(VehicleQueue::iterator currentVehicle );
     void worker();
 private slots:
     void AsyncWorkerCaller();
@@ -41,7 +41,7 @@ private:
 
 
     static constexpr int FINAL_POINT = 750;
-    static constexpr int MAX_DISTANCE = 80;
+    static constexpr int MIN_ALLOWED_DISTANCE = 140;
     static constexpr int MAX_VEH_NUM = 5;
 };
 

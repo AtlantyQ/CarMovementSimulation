@@ -23,6 +23,7 @@ SOURCES += \
     src/CWidgetFactory.cpp
 
 HEADERS += \ \
+    inc/CTimer.h \
     inc/CVechicleManager.h \
     inc/CMainWindow.h \
     inc/CVechicleModel.h \

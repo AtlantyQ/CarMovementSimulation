@@ -1,13 +1,10 @@
 #include "CVechicleModel.h"
 #include <cmath>
-#include <QDebug>
-#include <QString>
 #include <QMetaObject>
 #include <CWidgetFactory.h>
 
 #define PI 3.14159265
 #define ANGLE 0
-#define STYLE_SHEET "background-color: #F4F4F4; border-style: solid; border-color: black"
 
 
 CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor factor, int maxSpeed, QWidget* parent ) : m_Car( nullptr )
@@ -17,10 +14,11 @@ CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor facto
                                                                                                                    , m_CarType( type )
                                                                                                                    , m_Factor(factor)
                                                                                                                    , m_MaxSpeed( maxSpeed )
+                                                                                                                   , m_dtMv(0.0)
+                                                                                                                   , m_dtStop(0.0)
 
 {
-    qDebug() << " CVehicleModel x";
-    m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480} }, false );
+    m_Car = m_Factory->MakeWidgetFrame( { parent, color, { 80, 40 }, {0, 480} }, false );
     m_Car->hide();
     m_SpeedVal = m_Factory->MakeLabelFrame( { m_Car, { 80, 40 }, { 20, 0 } }, false );
     m_SpeedVal->hide();
@@ -43,46 +41,49 @@ CVehicleModel::~CVehicleModel()
 
 CVehicleModel::CVehicleModel( CVehicleModel&& x )
 {
-    qDebug() << " CVehicleModel& x";
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480 } } );
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480 } } );
     this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 20, 0 } } );
     this->m_CarPosition = { 0, 480 };
     this->m_Factor = x.m_Factor;
     this->m_MaxSpeed = x.m_MaxSpeed;
+    this->m_CarType = x.m_CarType;
 }
 
 CVehicleModel::CVehicleModel( CVehicleModel& x )
 {
-    qDebug() << " CVehicleModel& x";
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480 } } );
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480 } } );
     this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 20, 0 } } );
     this->m_CarPosition = { 0, 480 };
     this->m_Factor = x.m_Factor;
     this->m_MaxSpeed = x.m_MaxSpeed;
+    this->m_CarType = x.m_CarType;
 }
 
 CVehicleModel& CVehicleModel::operator=( CVehicleModel& x )
 {
-    qDebug() << " operator= &x";
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, STYLE_SHEET, { 80, 40 }, {0, 480} } );
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480} } );
     this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 20, 0 } } );
     this->m_CarPosition = { 0, 480 };
     this->m_Factor = x.m_Factor;
     this->m_MaxSpeed = x.m_MaxSpeed;
+    this->m_CarType = x.m_CarType;
 
     return x;
 }
 
 void CVehicleModel::move()
 {
+    m_Timer.SetStartPoint();
     m_Timer.start();
-    double dt = m_Timer.elapsed()/1000.0;
+
+    double diff = m_Timer.elapsed() - m_Timer.GetStartPoint();
+    double dt = ( m_Timer.GetDelta() + diff )/1000.f;
     double speed = this->calculateSpeed( dt );
     double dx = std::cos( ANGLE * PI/180 ) * speed;
     double dy = std::sin( ANGLE * PI/180 ) * speed;
@@ -94,21 +95,23 @@ void CVehicleModel::move()
 }
 
 void CVehicleModel::stop()
-{
-    double dt = m_Timer.elapsed()/1000.0;
-    double x0 = 2 * m_Factor.a + m_Factor.b;
-    double f1 = m_Factor.a  + m_Factor.b + m_Factor.c;
-    double speed = -1/x0 * dt + f1 * x0;
+{    
+    m_Timer.SetStopPoint();
+    m_Timer.start();
 
-    double dx = 1 * speed;
-    double dy = 0 * speed;
+    double diff = m_Timer.elapsed() - m_Timer.GetStopPoint();
+    double dt = ( m_Timer.GetStopPoint() - diff )/1000.f;
+    double speed = this->calculateSpeed( dt );
+    double dx = std::cos( ANGLE * PI/180 ) * speed;
+    double dy = std::sin( ANGLE * PI/180 ) * speed;
 
+
+    m_Timer.SetDeltaTime( dt );
     m_CarPosition.x += dx;
     m_CarPosition.y += dy;
-    this->setPos( m_CarPosition );
 
-    //http://zdajmyrazem.pl/Main/Theory/rownanie-stycznej-do-wykresu-funkcji-NTE5NA%3D%3D
-    //https://matfiz24.pl/funkcja-liniowa/prosta-prostopadla-rownolegla-zadania
+    this->setPos( m_CarPosition );
+    this->setSpeedValue( speed );
 }
 
 void CVehicleModel::hide()
@@ -120,8 +123,7 @@ double CVehicleModel::calculateSpeed( double dt )
 {
     double speed = m_Factor.a * dt * dt + m_Factor.b * dt + m_Factor.c;
 
-    //if( speed > m_MaxSpeed )
-    //    speed = m_MaxSpeed;
+    if( speed < 0 ) return 0;
 
     return speed;
 }
@@ -137,15 +139,16 @@ void CVehicleModel::setSpeedValue( double speed )
     m_SpeedVal->setText( speedTxt.c_str() );
 }
 
+Position CVehicleModel::getPos() const
+{
+    return m_CarPosition;
+}
+
 IVehicleModel* CVehicleModel::getClone()
 {
     return this;
 }
 
-Position CVehicleModel::getPos() const
-{
-    return m_CarPosition;
-}
 
 
 

@@ -3,36 +3,17 @@
 
 #include <QWidget>
 #include <QLabel>
-#include <QElapsedTimer>
 #include <string>
 #include <utility>
-#include <Qt>
+#include <CTimer.h>
 #include <memory>
 #include "IVechicleInterface.h"
 
+#include <QDebug>
+#include <QString>
+
 class CWidgetFactory;
 
-
-class Timer : public QElapsedTimer
-{
-public:
-    Timer() : isRunning(false){}
-    ~Timer() = default;
-
-    void start()
-    {
-        if(!isStarted())
-        {
-            QElapsedTimer::start();
-            isRunning = true;
-        }
-    }
-
-    bool isStarted() { return isRunning; }
-
-private:
-    bool isRunning;
-};
 
 typedef struct
 {
@@ -71,10 +52,14 @@ private:
     CWidgetFactory* m_Factory;
     Position m_CarPosition;
     std::string m_CarType;
+    std::string m_Color;
     Timer m_Timer;
     Factor m_Factor;
     double m_MaxSpeed;
-
+    double m_deltaTimeMv;
+    double m_dtMv;
+    double m_dtStop;
 };
 
 #endif // CVehicleCONTROLER_H
+
