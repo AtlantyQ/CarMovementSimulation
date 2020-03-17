@@ -9,7 +9,7 @@
 CMainWindow::CMainWindow( QWidget *parent ) : QMainWindow( parent ),
                                               m_VehicleCtrl( new CVehicleManager )
 {
-    int timeout = RAND_TIMEOUT( minTimeout, maxTimeout );
+    //int timeout = RAND_TIMEOUT( minTimeout, maxTimeout );
 
     this->setFixedSize( 850, 600 );
     this->setStyleSheet("background-color: #FFFFFF;");
