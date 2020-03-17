@@ -6,23 +6,28 @@
 #define PI 3.14159265
 #define ANGLE 0
 
+namespace
+{
+    constexpr QPoint labelPos = { 15, 0 };
+    constexpr QSize widgeSize = { 80, 40 };
+    constexpr QPoint widgetPos = { 0, 280 };
+}
+
 
 CVehicleModel::CVehicleModel(  std::string type, std::string color, Factor factor, int maxSpeed, QWidget* parent ) : IVehicleModel( nullptr )
                                                                                                                    , m_Car( nullptr )
                                                                                                                    , m_SpeedVal( nullptr )
                                                                                                                    , m_Factory( new CWidgetFactory )
-                                                                                                                   , m_CarPosition{ 0, 480}
-                                                                                                                   , m_CarType( type )
+                                                                                                                   , m_CarPosition{ widgetPos.x(), widgetPos.y() }
+                                                                                                                   , m_CarType(type)
                                                                                                                    , m_Factor(factor)
                                                                                                                    , m_MaxSpeed( maxSpeed )
                                                                                                                    , m_dtMv(0.0)
                                                                                                                    , m_dtStop(0.0)
 
 {
-    m_Car = m_Factory->MakeWidgetFrame( { parent, color, { 80, 40 }, {0, 480} }, false );
-    m_Car->hide();
-    m_SpeedVal = m_Factory->MakeLabelFrame( { m_Car, { 80, 40 }, { 15, 0 } }, false );
-    m_SpeedVal->hide();
+    m_Car = m_Factory->MakeWidgetFrame( { parent, color, widgeSize, {widgetPos.x(), widgetPos.y()} }, false );
+    m_SpeedVal = m_Factory->MakeLabelFrame( { m_Car, widgeSize, labelPos }, false );
 }
 
 CVehicleModel::~CVehicleModel()
@@ -38,59 +43,57 @@ CVehicleModel::~CVehicleModel()
         m_SpeedVal->deleteLater();
         m_SpeedVal = nullptr;
     }
+
+    if( m_Factory )
+    {
+        delete m_Factory;
+        m_Factory = nullptr;
+    }
 }
 
 CVehicleModel::CVehicleModel( CVehicleModel&& x ) : IVehicleModel( nullptr )
                                                   , m_Car( nullptr )
                                                   , m_SpeedVal( nullptr )
                                                   , m_Factory( new CWidgetFactory )
-                                                  , m_CarPosition{ 0, 480}
-                                                  , m_CarType()
-                                                  , m_Factor({ 0.f, 0.f, 0.f})
-                                                  , m_MaxSpeed( 0 )
+                                                  , m_CarPosition{ widgetPos.x(), widgetPos.y() }
+                                                  , m_CarType(x.m_CarType)
+                                                  , m_Factor(x.m_Factor)
+                                                  , m_MaxSpeed(x.m_MaxSpeed)
                                                   , m_dtMv(0.0)
                                                   , m_dtStop(0.0)
 
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480 } } );
-    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 15, 0 } } );
-    this->m_CarPosition = { 0, 480 };
-    this->m_Factor = x.m_Factor;
-    this->m_MaxSpeed = x.m_MaxSpeed;
-    this->m_CarType = x.m_CarType;
-}
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), widgeSize, { widgetPos.x(), widgetPos.y() } } );
+    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, widgeSize, labelPos } );
+ }
 
 CVehicleModel::CVehicleModel( CVehicleModel& x ) : IVehicleModel( nullptr )
                                                  , m_Car( nullptr )
                                                  , m_SpeedVal( nullptr )
                                                  , m_Factory( new CWidgetFactory )
-                                                 , m_CarPosition{ 0, 480}
-                                                 , m_CarType()
-                                                 , m_Factor({ 0.f, 0.f, 0.f})
-                                                 , m_MaxSpeed( 0 )
+                                                 , m_CarPosition{ widgetPos.x(), widgetPos.y() }
+                                                 , m_CarType(x.m_CarType)
+                                                 , m_Factor(x.m_Factor)
+                                                 , m_MaxSpeed(x.m_MaxSpeed)
                                                  , m_dtMv(0.0)
                                                  , m_dtStop(0.0)
 
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480 } } );
-    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 15, 0 } } );
-    this->m_CarPosition = { 0, 480 };
-    this->m_Factor = x.m_Factor;
-    this->m_MaxSpeed = x.m_MaxSpeed;
-    this->m_CarType = x.m_CarType;
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), widgeSize, { widgetPos.x(), widgetPos.y() } } );
+    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, widgeSize, labelPos } );
 }
 
 CVehicleModel& CVehicleModel::operator=( CVehicleModel& x )
 {
     QWidget* parent = static_cast<QWidget*>( x.m_Car->parent() );
 
-    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), { 80, 40 }, {0, 480} } );
-    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, { 80, 40 }, { 15, 0 } } );
-    this->m_CarPosition = { 0, 480 };
+    this->m_Car = m_Factory->MakeWidgetFrame( { parent, x.m_Car->styleSheet().toStdString(), widgeSize, { widgetPos.x(), widgetPos.y() } } );
+    this->m_SpeedVal = m_Factory->MakeLabelFrame( { this->m_Car, widgeSize, labelPos } );
+    this->m_CarPosition = { widgetPos.x(), widgetPos.y() };
     this->m_Factor = x.m_Factor;
     this->m_MaxSpeed = x.m_MaxSpeed;
     this->m_CarType = x.m_CarType;
@@ -144,9 +147,7 @@ double CVehicleModel::calculateSpeed( double dt )
 {
     double speed = m_Factor.a * dt * dt + m_Factor.b * dt + m_Factor.c;
 
-    if( speed < 0 ) return 0;
-
-    return speed;
+    return ( speed > 0 )? speed : 0;
 }
 
 void CVehicleModel::setPos( const Position& positon  )

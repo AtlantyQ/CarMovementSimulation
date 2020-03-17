@@ -27,7 +27,7 @@ QLabel* CWidgetFactory::MakeLabelFrame(LabelOptions& options, bool visibility )
 QLabel* CWidgetFactory::MakeLabelFrame(LabelOptions&& options, bool visibility)
 {
     QLabel* label = new QLabel( "0 km/h", options.parent );
-    label->setFixedSize(  options.fixedSize.first, options.fixedSize.second );
+    label->setFixedSize( options.size );
     label->move( options.pos );
     label->setVisible( visibility );
 

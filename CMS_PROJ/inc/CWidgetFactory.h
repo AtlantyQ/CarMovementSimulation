@@ -8,6 +8,8 @@
 class QWidget;
 class QLabel;
 
+typedef std::pair<int, int> FixedSize;
+
 typedef struct
 {
   QWidget* parent;
@@ -19,7 +21,7 @@ typedef struct
 typedef struct
 {
   QWidget* parent;
-  std::pair<int, int> fixedSize;
+  QSize size;
   QPoint pos;
 } LabelOptions;
 
