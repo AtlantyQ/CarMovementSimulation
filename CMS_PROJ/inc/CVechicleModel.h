@@ -34,18 +34,18 @@ public:
     virtual ~CVehicleModel();
 
 
-    void setPos( const Position& positon );
-    void setSpeedValue( double speed );
-    Position getPos() const;
-    IVehicleModel* getClone();
+    void setPos( const Position& positon ) override ;
+    Position getPos() const override;
+    IVehicleModel* getClone() override;
 
 public slots:
-    void move();
-    void stop();
-    void hide();
+    void move() override;
+    void stop() override;
+    void hide() override;
 
 private:
     double calculateSpeed( const double dt );
+    void setSpeedValue( double speed );
 
     QWidget* m_Car;
     QLabel* m_SpeedVal;
@@ -56,9 +56,6 @@ private:
     Timer m_Timer;
     Factor m_Factor;
     double m_MaxSpeed;
-    double m_deltaTimeMv;
-    double m_dtMv;
-    double m_dtStop;
 };
 
 #endif // CVehicleCONTROLER_H

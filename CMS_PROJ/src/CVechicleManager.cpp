@@ -56,7 +56,6 @@ void CVehicleManager::AsyncWorkerCaller()
 void CVehicleManager::worker()
 {
     std::lock_guard<std::mutex> mlck( m_CarQueueMtx );
-    //qDebug() << QString("m_VehiclesQueue: %1 \n").arg(m_VehiclesQueue.size());
     for( auto vehicle = m_VehiclesQueue.begin(); vehicle != m_VehiclesQueue.end(); ++vehicle )
     {
         if( IsAboutToCrash( vehicle ) )

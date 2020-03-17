@@ -34,9 +34,8 @@ private slots:
 
 private:
     VehicleMap m_CarPrototypes;
-    std::mutex m_CarQueueMtx;
-    std::mutex m_CarPrototypeMtx;
     VehicleQueue m_VehiclesQueue;
+    std::mutex m_CarQueueMtx;
     QTimer m_AsyncCaller;
 
 
