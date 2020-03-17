@@ -14,7 +14,7 @@ public:
     ~CMainWindow() = default;
     void show();
 
-private:
+protected:
     Q_SLOT void TimeOut();
 
     QWidget m_Road;

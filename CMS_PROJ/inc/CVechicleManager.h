@@ -22,14 +22,15 @@ public:
     void AddNextVehicleToQueue();
     void CreatePrototypes( QWidget* parent = nullptr ) ;
 
-private:
-    IVehicleModel* GetCarPrototype( VehicleType id );
-    bool IsAboutToCrash(VehicleQueue::iterator currentVehicle );
-    void worker();
-private slots:
+
+protected slots:
     void AsyncWorkerCaller();
 
-private:
+protected:
+    void worker();
+    IVehicleModel* GetCarPrototype( VehicleType id );
+    bool IsAboutToCrash(VehicleQueue::iterator currentVehicle );
+
     VehicleMap m_CarPrototypes;
     VehicleQueue m_VehiclesQueue;
     std::mutex m_CarQueueMtx;
