@@ -26,7 +26,6 @@ void CMainWindow::show()
 
 void CMainWindow::TimeOut()
 {
-    qDebug() << "TimeOut ";
     int nextTimeout = RAND_TIMEOUT( minTimeout, maxTimeout );
 
     m_VehicleCtrl->AddNextVehicleToQueue();
