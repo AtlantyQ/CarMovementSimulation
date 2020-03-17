@@ -5,15 +5,11 @@
 #include <QLabel>
 #include <string>
 #include <utility>
-#include <CTimer.h>
 #include <memory>
+#include "CTimer.h"
 #include "IVechicleInterface.h"
 
-#include <QDebug>
-#include <QString>
-
 class CWidgetFactory;
-
 
 typedef struct
 {

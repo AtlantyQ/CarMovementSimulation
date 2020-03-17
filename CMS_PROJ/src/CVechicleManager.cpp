@@ -1,7 +1,5 @@
 #include "CVechicleManager.h"
 #include "CVechicleModel.h"
-#include "Qt"
-#include <QtDebug>
 #include <QTimer>
 #include <QMetaObject>
 

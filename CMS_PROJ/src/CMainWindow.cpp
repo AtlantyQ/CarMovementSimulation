@@ -1,8 +1,6 @@
-#include <Qt>
 #include "CMainWindow.h"
 #include "CVechicleManager.h"
 #include "random"
-#include <QDebug>
 
 #define RAND_TIMEOUT( min, max ) min + std::rand() % ( (max + 1) - min )
 

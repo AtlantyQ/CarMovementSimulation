@@ -3,17 +3,14 @@
 
 #include <QObject>
 #include <QTimer>
-#include <condition_variable>
-#include <thread>
 #include <mutex>
 #include <vector>
 #include <map>
-#include <future>
 #include "IVechicleManager.h"
 #include "IVechicleInterface.h"
 
 typedef std::vector<std::unique_ptr<IVehicleModel>> VehicleQueue;
-typedef std::map< VehicleType, std::unique_ptr<IVehicleModel> > VehicleMap;
+typedef std::map< VehicleType, std::unique_ptr<IVehicleModel>> VehicleMap;
 
 class CVehicleManager : public IVehicleManager
 {

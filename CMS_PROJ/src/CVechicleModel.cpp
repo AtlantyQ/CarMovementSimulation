@@ -1,7 +1,7 @@
-#include "CVechicleModel.h"
 #include <cmath>
 #include <QMetaObject>
-#include <CWidgetFactory.h>
+#include "CWidgetFactory.h"
+#include "CVechicleModel.h"
 
 #define PI 3.14159265
 #define ANGLE 0
